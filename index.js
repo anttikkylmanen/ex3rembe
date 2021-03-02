@@ -30,8 +30,20 @@ app.get('/', (req, res) => {
   res.send('<h1>Hello World!</h1>')
 })
 
-app.get('/reminders', (req, res) => {
+app.get('/api/reminders/', (req, res) => {
   res.json(reminders)
+})
+
+app.get('/api/reminders/:id', (req, res) => {
+  const id = Number(req.params.id)
+  const reminder = reminders.reminders.find(reminder => reminder.id === id)
+  
+
+  if (reminder) {
+    res.json(reminder)
+  } else {
+    res.status(404).end()
+  }
 })
 
 const PORT = 3001
