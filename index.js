@@ -1,6 +1,10 @@
-const { response } = require('express')
+//const { response } = require('express')
 const express = require('express')
 const app = express()
+const bodyParser = require('body-parser')
+const { response } = require('express')
+
+app.use(bodyParser.json())
 
 let reminders = {
   "reminders": [
@@ -53,6 +57,31 @@ app.delete('/api/reminders/:id', (req, res) =>{
   reminders = reminders.reminders.filter(reminder => reminder.id !== id)
   res.status(204).end()
 
+})
+
+const generateId = () => {
+  const id = Math.floor(Math.random()*10000000)
+  //console.log(id, typeof id, String(id))
+  return id
+}
+
+app.post('/api/reminders/', (req, res) =>{
+  const body = req.body
+  console.log(body)
+
+  if (body.name === undefined) {
+    return res.status(400).json({error: 'content missing'})
+  }
+
+  const reminder = {
+    name: body.name,
+    timestamp: body.timestamp,
+    id: generateId()
+  }
+console.log(reminder)
+  reminders.reminders= reminders.reminders.concat(reminder)
+
+  res.json(reminder)
 })
 
 const PORT = 3001
