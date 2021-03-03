@@ -61,16 +61,29 @@ app.delete('/api/reminders/:id', (req, res) =>{
 
 const generateId = () => {
   const id = Math.floor(Math.random()*10000000)
-  //console.log(id, typeof id, String(id))
   return id
+}
+
+const isInArray = (props) => {
+  const names= reminders.reminders.map(name => name.name)
+  const verdict = names.includes(props)
+  return verdict
 }
 
 app.post('/api/reminders/', (req, res) =>{
   const body = req.body
-  console.log(body)
 
   if (body.name === undefined) {
     return res.status(400).json({error: 'content missing'})
+  }
+
+  if (body.name.trim().length === 0 || body.timestamp.trim().length === 0){
+    return res.status(400).json({error: 'content missing!'})
+  }
+  
+  
+  if (isInArray(body.name)){
+    return res.status(400).json({error: 'name must be unique'})
   }
 
   const reminder = {
@@ -78,7 +91,7 @@ app.post('/api/reminders/', (req, res) =>{
     timestamp: body.timestamp,
     id: generateId()
   }
-console.log(reminder)
+
   reminders.reminders= reminders.reminders.concat(reminder)
 
   res.json(reminder)
