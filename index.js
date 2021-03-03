@@ -60,13 +60,14 @@ app.delete('/api/reminders/:id', (req, res) =>{
 })
 
 const generateId = () => {
-  const id = Math.random()
-  //console.log(id)
+  const id = Math.floor(Math.random()*10000000)
+  //console.log(id, typeof id, String(id))
   return id
 }
 
 app.post('/api/reminders/', (req, res) =>{
   const body = req.body
+  console.log(body)
 
   if (body.name === undefined) {
     return res.status(400).json({error: 'content missing'})
@@ -77,8 +78,8 @@ app.post('/api/reminders/', (req, res) =>{
     timestamp: body.timestamp,
     id: generateId()
   }
-
-  reminders= reminders.reminders.concat(reminder)
+console.log(reminder)
+  reminders.reminders= reminders.reminders.concat(reminder)
 
   res.json(reminder)
 })
