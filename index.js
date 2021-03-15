@@ -1,10 +1,20 @@
-//const { response } = require('express')
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
-const { response } = require('express')
+const cors = require('cors')
 
+app.use(cors())
 app.use(bodyParser.json())
+
+
+const requestLogger = (request, response, next) => {
+  console.log('Method:', request.method)
+  console.log('Path:  ', request.path)
+  console.log('Body:  ', request.body)
+  console.log('---')
+  next()
+}
+app.use(requestLogger)
 
 let reminders = {
   "reminders": [
@@ -31,32 +41,30 @@ let reminders = {
   ]
 }
 
-app.get('/', (req, res) => {
-  res.send('<h1>Hello World!</h1>')
+app.get('/', (request, response) => {
+  response.send('<h1>Hello World!</h1>')
 })
 
-app.get('/api/reminders/', (req, res) => {
-  res.json(reminders)
+app.get('/api/reminders', (request, response) => {
+  response.json(reminders.reminders)
 })
 
-app.get('/api/reminders/:id', (req, res) => {
-  const id = Number(req.params.id)
+app.get('/api/reminders/:id', (request, response) => {
+  const id = Number(request.params.id)
   const reminder = reminders.reminders.find(reminder => reminder.id === id)
-  
 
   if (reminder) {
-    res.json(reminder)
+    response.json(reminder) 
   } else {
-    res.status(404).end()
+    response.status(404).end()
    
   }
 })
 
-app.delete('/api/reminders/:id', (req, res) =>{
-  const id = Number(req.params.id)
-  reminders = reminders.reminders.filter(reminder => reminder.id !== id)
-  res.status(204).end()
-
+app.delete('/api/reminders/:id', (request, response) =>{
+  const id = Number(request.params.id)
+  reminders.reminders = reminders.reminders.filter(reminder => reminder.id !== id)
+  response.status(204).end()
 })
 
 const generateId = () => {
@@ -70,20 +78,22 @@ const isInArray = (props) => {
   return verdict
 }
 
-app.post('/api/reminders/', (req, res) =>{
-  const body = req.body
+app.post('/api/reminders/', (request, response) =>{
+  const body = request.body
+  console.log(request.body)
+  
 
   if (body.name === undefined) {
-    return res.status(400).json({error: 'content missing'})
+    return response.status(400).json({error: 'content missing'})
   }
 
   if (body.name.trim().length === 0 || body.timestamp.trim().length === 0){
-    return res.status(400).json({error: 'content missing!'})
+    return response.status(400).json({error: 'content missing!'})
   }
   
   
   if (isInArray(body.name)){
-    return res.status(400).json({error: 'name must be unique'})
+    return response.status(400).json({error: 'name must be unique'})
   }
 
   const reminder = {
@@ -94,10 +104,15 @@ app.post('/api/reminders/', (req, res) =>{
 
   reminders.reminders= reminders.reminders.concat(reminder)
 
-  res.json(reminder)
+  response.json(reminder)
 })
 
-const PORT = 3001
+/*const error = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+app.use(error)*/
+
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
