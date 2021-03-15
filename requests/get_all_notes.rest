@@ -1,6 +1,6 @@
 //GET https://warm-everglades-28702.herokuapp.com/
 
-//GET http://localhost:3001/api/reminders/
+GET http://localhost:3001/api/reminders/
 //DELETE http://localhost:3001/api/reminders/3
 //POST http://localhost:3001/api/reminders/
 //content-type: application/json
