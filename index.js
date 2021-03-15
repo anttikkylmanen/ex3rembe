@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 
 app.use(cors())
+
 app.use(bodyParser.json())
 
 
@@ -41,9 +42,9 @@ let reminders = {
   ]
 }
 
-//app.get('/', (request, response) => {
+app.get('/', (request, response) => {
   //response.send('<h1>Hello World!</h1>')
-//})
+})
 
 app.get('/api/reminders', (request, response) => {
   response.json(reminders.reminders)
