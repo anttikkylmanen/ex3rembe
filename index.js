@@ -41,9 +41,9 @@ let reminders = {
   ]
 }
 
-app.get('/', (request, response) => {
-  response.send('<h1>Hello World!</h1>')
-})
+//app.get('/', (request, response) => {
+  //response.send('<h1>Hello World!</h1>')
+//})
 
 app.get('/api/reminders', (request, response) => {
   response.json(reminders.reminders)
