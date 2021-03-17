@@ -2,12 +2,16 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const Reminder = require('./models/reminder')
 
 app.use(cors())
 app.use(bodyParser.json())
 app.use(express.static('build'))
 
 
+
+
+/*
 const requestLogger = (request, response, next) => {
   console.log('Method:', request.method)
   console.log('Path:  ', request.path)
@@ -16,7 +20,8 @@ const requestLogger = (request, response, next) => {
   next()
 }
 app.use(requestLogger)
-
+*/
+/*
 let reminders = {
   "reminders": [
     {
@@ -40,6 +45,13 @@ let reminders = {
       "id": 4
     }
   ]
+}*/
+const formatReminder = (reminder) => {
+  return {
+    name: reminder.name,
+    timestamp: reminder.timestamp,
+    id: reminder._id
+  }
 }
 
 app.get('/', (request, response) => {
@@ -47,7 +59,12 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/reminders', (request, response) => {
-  response.json(reminders.reminders)
+  Reminder
+    .find({})
+    .then(reminders => {
+      response.json(reminders.map(formatReminder))
+    })
+  
 })
 
 app.get('/api/reminders/:id', (request, response) => {
@@ -63,11 +80,23 @@ app.get('/api/reminders/:id', (request, response) => {
 })
 
 app.delete('/api/reminders/:id', (request, response) =>{
+  Reminder
+    .findByIdAndRemove(request.params.id)
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => {
+      response.status(400).send({ error: 'malformatted id' })
+    })
+  
+  /*
   const id = Number(request.params.id)
   reminders.reminders = reminders.reminders.filter(reminder => reminder.id !== id)
   response.status(204).end()
+  */
 })
 
+/*
 const generateId = () => {
   const id = Math.floor(Math.random()*10000000)
   return id
@@ -78,34 +107,36 @@ const isInArray = (props) => {
   const verdict = names.includes(props)
   return verdict
 }
+*/
 
 app.post('/api/reminders/', (request, response) =>{
   const body = request.body
-  console.log(request.body)
-  
 
   if (body.name === undefined) {
     return response.status(400).json({error: 'content missing'})
   }
-
+/* 
   if (body.name.trim().length === 0 || body.timestamp.trim().length === 0){
     return response.status(400).json({error: 'content missing!'})
   }
   
-  
   if (isInArray(body.name)){
     return response.status(400).json({error: 'name must be unique'})
   }
-
-  const reminder = {
+*/
+  const reminder = new Reminder({
     name: body.name,
     timestamp: body.timestamp,
-    id: generateId()
-  }
+    //id: generateId()
+  })
 
-  reminders.reminders= reminders.reminders.concat(reminder)
-
-  response.json(reminder)
+  //reminders.reminders= reminders.reminders.concat(reminder)
+  reminder
+    .save()
+    .then(savedReminder => {
+      response.json(formatReminder(savedReminder))
+    })
+  
 })
 
 //const error = (request, response) => {
